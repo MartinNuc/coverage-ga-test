@@ -1,3 +1,5 @@
+[![Test Coverage](https://api.codeclimate.com/v1/badges/8c10311f4743fd2b834a/test_coverage)](https://codeclimate.com/github/MartinNuc/coverage-ga-test/test_coverage)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
