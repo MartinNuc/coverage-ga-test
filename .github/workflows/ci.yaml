@@ -7,7 +7,7 @@ on:
     branches: [master]
 
 jobs:
-  coverage:
+  no-locations:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,10 +21,50 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile    
       - name: Coverage to Codeclimate
-        uses: MartinNuc/codeclimate-action@v2.5.10
+        uses: MartinNuc/codeclimate-action@2
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}
+
+  single-location:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile    
+      - name: Coverage to Codeclimate
+        uses: MartinNuc/codeclimate-action@2
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}
+        with:
+          coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
+
+  multiple-locations:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile    
+      - name: duplicate coverage result
+        run: yarn coverage && cp ${{github.workspace}}/coverage/lcov.info ${{github.workspace}}/coverage/lcov2.info
+      - name: Coverage to Codeclimate
+        uses: MartinNuc/codeclimate-action@2
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}
         with:
           coverageLocations: |
-            ${{github.workspace}}/client/coverage/lcov.info:lcov
-            ${{github.workspace}}/server/coverage/lcov.info:lcov
+            ${{github.workspace}}/coverage/lcov.info:lcov
+            ${{github.workspace}}/coverage/lcov2.info:lcov
